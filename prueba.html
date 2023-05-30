@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Formulario de Venue</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+
+<body>
+  <form id="venue-form">
+    <label for="venue_name">Nombre:</label>
+    <input type="text" id="venue_name" name="venue_name"><br><br>
+
+    <label for="venue_address">Dirección:</label>
+    <input type="text" id="venue_address" name="venue_address"><br><br>
+
+    <label for="venue_capacity">Capacidad:</label>
+    <input type="number" id="venue_capacity" name="venue_capacity"><br><br>
+
+    <button type="submit">Crear Venue</button>
+  </form>
+
+  <div id="response"></div>
+  <div id="error"></div>
+
+</body>
+
+<script>
+  document.getElementById('venue-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    var venueParams = {
+      venue: {
+        name: document.getElementById('venue_name').value,
+        address: document.getElementById('venue_address').value,
+        capacity: document.getElementById('venue_capacity').value
+      }
+    };
+
+    fetch('http://localhost:3000/venues.json', {
+      method: 'POST', redirect: 'follow',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(venueParams)
+    })
+      .then(function (response) {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Error en la petición.');
+        }
+      })
+      .then(function (data) {
+        // Mostrar la respuesta en el HTML
+        var responseDiv = document.getElementById('response');
+        responseDiv.innerHTML = `
+              <div class="alert alert-success">
+                <strong>Éxito:</strong> Venue creado correctamente.
+                <ul>
+                  <li>Name: ${data.name}</li>
+                  <li>Address: ${data.address}</li>
+                  <li>Capacity: ${data.capacity}</li>
+                </ul>
+              </div>
+            `;
+      })
+      .catch(function (error) {
+        // Mostrar el error en el HTML
+        var errorDiv = document.getElementById('error');
+        errorDiv.innerHTML = `
+              <div class="alert alert-danger">
+                <strong>Error:</strong> ${error.message}
+              </div>
+            `;
+      });
+  });
+</script>
+
+</html>
